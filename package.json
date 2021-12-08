@@ -1,0 +1,36 @@
+{
+  "name": "helpdesk",
+  "version": "1.0.0",
+  "description": "helpDesk homeWork",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "lint-fix": "eslint . --fix",
+    "prestart": "npm install",
+    "start": "forever ./src/server.js",
+    "watch": "forever -w ./src/server.js"
+  },
+  "engines": {
+    "node": "11.x"
+  },
+  "repository": "git@github.com:Pavel-A-T/HelpDesk.git",
+  "author": "Pavel",
+  "license": "MIT",
+  "dependencies": {
+    "core-js": "^3.7.0",
+    "forever": "^4.0.1",
+    "koa": "^2.13.4",
+    "koa-body": "^4.2.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3",
+    "@babel/preset-env": "^7.12.1",
+    "babel-jest": "^26.6.3",
+    "babel-loader": "^8.2.1",
+    "eslint": "^7.13.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
+  }
+}
