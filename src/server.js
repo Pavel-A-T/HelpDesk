@@ -1,37 +1,38 @@
-const port = process.env.PORT || 7070;
-const server = http.createServer(app.callback()).listen(port);
-
-
-const http = require('http');
 const Koa = require('koa');
+const KoaBody = require('koa-body');
+const Router = require('koa-router');
+const bodyParser = require('koa-bodyparser');
+const fileSystem = require('fs');
+const config = require('./config')
 
 
 const app = new Koa();
+const router = new Router();
 
-const server = http.createServer((req, res) => {
-    console.log(req);
-    res.end('server response');
-});
-const port = 7070;
-// слушаем определённый порт
-server.listen(port, (err) => {
-    if (err) {
-        console.log('Error occured:', error);
-        return;
-    }
-    console.log(`server is listening on ${port}`);
+const path = './src/db.json';
+const fileDB = fileSystem.readFileSync(path);
+const dataFromDB = JSON.parse(fileDB);
+
+router.get('/', ctx => {
+    const fileDB = fileSystem.readFileSync(path);
+    let dataFromDB = JSON.parse(fileDB);
+    dataFromDB.map(i => delete i.description);
+    ctx.body = dataFromDB;
 });
 
-
-app.use(async (ctx) => {
-    ctx.response.body = 'server response';
+router.post('/', ctx => {
+    console.log(ctx.params);
+    const data = ctx.request.body;
+    fileSystem.writeFileSync(path, JSON.stringify([...dataFromDB, data]));
+    ctx.body = data;
 });
-const server = http.createServer(app.callback()).listen(7070);
 
-app.use(async (ctx, next) => {
-// do something
-    await next(); // передача контроля следующему middleware
-// do something
-})
+app.use(bodyParser());
+app.use(router.routes());
+app.use(router.allowedMethods());
+app.listen(config.port, () => {console.log(`Server started on port ${config.port}`)});
+
+
+
 
 
