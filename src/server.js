@@ -7,10 +7,7 @@ const config = require('./config');
 
 const app = new Koa();
 const router = new Router();
-
 const path = './src/db.json';
-const fileDB = fileSystem.readFileSync(path);
-//const dataFromDB = [{"id":1,"name":"Создам одну заявку на поиграться","description":"Заявку можно редактировать. Можно увидеть полное описание при нажатии на Кратком описании заявки","status":"false","created":"11.12.2021, 19:24:54"}]
 
 app.use(async (ctx, next) => {
   const origin = ctx.request.get('Origin');
@@ -48,6 +45,7 @@ app.use(async (ctx, next) => {
 
 router.get('/allTickets', async (ctx) => {
   try {
+    const fileDB = fileSystem.readFileSync(path);
     const dataFromDB = JSON.parse(fileDB);
     dataFromDB.map((item) => delete item.description);
     ctx.body = dataFromDB;
@@ -63,6 +61,7 @@ router.get('/:id', async (ctx) => {
     let { id } = ctx.params;
     id = Number(id);
     if (Number.isNaN(id) || !Number.isInteger(id) || id < 0) throw new Error(" incorrect 'id'");
+    const fileDB = fileSystem.readFileSync(path);
     const dataFromDB = JSON.parse(fileDB);
     const { description } = dataFromDB.filter((i) => i.id === id)[0];
     ctx.body = description;
@@ -76,6 +75,7 @@ router.get('/:id', async (ctx) => {
 router.post('/status', async (ctx) => {
   try {
     const data = ctx.request.body;
+    const fileDB = fileSystem.readFileSync(path);
     const dataFromDB = JSON.parse(fileDB);
     const { id } = data;
     const { status } = data;
@@ -85,8 +85,7 @@ router.post('/status', async (ctx) => {
       const index = dataFromDB.findIndex((item) => item === dataTicket);
       if (index > -1) dataFromDB.splice(index, 1);
       dataTicket.status = status;
-      fileSystem.writeFileSync(`${path}`, JSON.stringify([...dataFromDB, dataTicket]));
-      //dataFromDB.push(dataTicket);
+      fileSystem.writeFileSync(`${__dirname}/db.json`, JSON.stringify([...dataFromDB, dataTicket]));
     } else {
       throw new Error('Status is equals!');
     }
@@ -101,6 +100,7 @@ router.post('/status', async (ctx) => {
 router.post('/', async (ctx) => {
   try {
     const data = ctx.request.body;
+    const fileDB = fileSystem.readFileSync(path);
     const dataFromDB = JSON.parse(fileDB);
     let result;
 
@@ -117,8 +117,7 @@ router.post('/', async (ctx) => {
       } else {
         result = { id: 1, ...data };
       }
-      fileSystem.writeFileSync(`${path}`, JSON.stringify([...dataFromDB, result]));
-      //dataFromDB.push(result);
+      fileSystem.writeFileSync(`${__dirname}/db.json`, JSON.stringify([...dataFromDB, result]));
     }
 
     if (data.id) {
@@ -128,7 +127,7 @@ router.post('/', async (ctx) => {
         ticket.description = data.description;
         ticket.status = data.status;
         ticket.created = data.created;
-        fileSystem.writeFileSync(`${path}`, JSON.stringify([...dataFromDB]));
+        fileSystem.writeFileSync(`${__dirname}/db.json`, JSON.stringify([...dataFromDB]));
         delete data.id;
       } else throw new Error(`no such id = ${data.id}`);
     }
@@ -142,13 +141,14 @@ router.post('/', async (ctx) => {
 
 router.post('/id', async (ctx) => {
   try {
+    const fileDB = fileSystem.readFileSync(path);
     let { id } = ctx.request.body;
     id = Number(id);
     if (Number.isNaN(id) || !Number.isInteger(id) || id < 0) throw new Error(" incorrect 'id'");
     const dataFromDB = JSON.parse(fileDB);
     const index = dataFromDB.findIndex((i) => i.id === id);
     if (index > -1) dataFromDB.splice(index, 1);
-    fileSystem.writeFileSync(`${path}`, JSON.stringify([...dataFromDB]));
+    fileSystem.writeFileSync(`${__dirname}/db.json`, JSON.stringify([...dataFromDB]));
     ctx.body = true;
   } catch (error) {
     console.error('err', error);
