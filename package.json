@@ -22,6 +22,7 @@
     "forever": "^4.0.1",
     "fs": "^0.0.1-security",
     "koa": "^2.13.4",
+    "koa-body": "^4.2.0",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^10.1.1"
   },
